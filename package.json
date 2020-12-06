@@ -1,0 +1,46 @@
+{
+  "name": "gulp-path-alias",
+  "version": "1.0.0",
+  "description": "path alias",
+  "main": "index.js",
+  "scripts": {
+    "test": "ava"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CryUshio/gulp-path-alias.git"
+  },
+  "keywords": [
+    "gulp",
+    "gulpplugin",
+    "alias",
+    "path",
+    "replace",
+    "别名",
+    "路径",
+    "替换"
+  ],
+  "author": {
+    "name": "CryUshio",
+    "email": "1151291182@qq.com",
+    "url": "https://github.com/CryUshio"
+  },
+  "license": "LGPL-2.1-or-later",
+  "bugs": {
+    "url": "https://github.com/CryUshio/gulp-path-alias/issues"
+  },
+  "homepage": "https://github.com/CryUshio/gulp-path-alias#readme",
+  "engines": {
+    "node": ">=8"
+  },
+  "files": [
+    "index.js"
+  ],
+  "devDependencies": {
+    "ava": "^3.13.0",
+    "gulp": "^4.0.2"
+  },
+  "dependencies": {
+    "replacestream": "^4.0.3"
+  }
+}
