@@ -9,10 +9,11 @@ const prefixPattenMap = {
   css: `@import\\s*|url\\s*\\(`
 };
 
+const suffixPatten = `\\/|['"]|\\s*\\)`;
 
 function getRegExp(prefixPatten) {
   return function (aliasName) {
-    return new RegExp(`(?:(${prefixPatten})\\s*['"]?\\s*)${aliasName}(\\/[^'";=)]*|['"]|\\s*\\))`, 'gm');
+    return new RegExp(`(?:(${prefixPatten})\\s*['"]?\\s*)${aliasName}(${suffixPatten})`, 'gm');
   }
 }
 
@@ -28,7 +29,7 @@ function relative(from, to) {
 
 // 100000 rows * 100 columns -> 248ms
 function replaceAll(file, dirname, aliasMap) {
-  const ext = path.extname(file.relative); 
+  const ext = path.extname(file.relative);
   const isStream = file.isStream();
 
   let reg;
@@ -62,12 +63,13 @@ function replaceAll(file, dirname, aliasMap) {
 
   Object.keys(aliasMap).forEach((alias) => {
     const regExp = reg(alias);
-    const replacer = relative(dirname, aliasMap[alias]);
+    const subReg = new RegExp(`${alias}(${suffixPatten})`);
+    const replacer = `${relative(dirname, aliasMap[alias])}$1`;
 
     if (isStream) {
-      file.contents = file.contents.pipe(replace(regExp, (match) => match.replace(alias, replacer)));
+      file.contents = file.contents.pipe(replace(regExp, (match) => match.replace(subReg, replacer)));
     } else {
-      file.contents = Buffer.from(String(file.contents).replace(regExp, (match) => match.replace(alias, replacer)));
+      file.contents = Buffer.from(String(file.contents).replace(regExp, (match) => match.replace(subReg, replacer)));
     }
   });
 
