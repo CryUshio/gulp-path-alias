@@ -5,7 +5,7 @@ const replace = require('replacestream');
 const prefixPattenMap = {
   js: `import\\s*[^'"]*\\(?|from|require\\s*\\(`,
   // poster: wxml
-  xml: `src=|url=|poster=`,
+  xml: `src=|url=|poster=|href=`,
   css: `@import\\s*|url\\s*\\(`
 };
 
