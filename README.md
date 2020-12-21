@@ -1,8 +1,6 @@
 # gulp-path-alias ![build](https://img.shields.io/badge/build-passing-green)
 `gulp` 路径别名
 
-Project forked from CryUshio[https://github.com/CryUshio/gulp-path-alias]
-
 ## Install
 ```
 $ npm install --save-dev gulp-path-alias
