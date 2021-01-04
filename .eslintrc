@@ -1,0 +1,27 @@
+{
+  "extends": ["plugin:@typescript-eslint/recommended"],
+  "parser":  "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
+  "env": {
+    "node": true
+  },
+  "rules": {
+    "@typescript-eslint/no-var-requires": 0,
+    "@typescript-eslint/no-empty-function": 0,
+    "@typescript-eslint/no-non-null-assertion": 0,
+    "@typescript-eslint/triple-slash-reference": 0,
+    "import/prefer-default-export": 0,
+    "import/extensions": 0,
+    "import/no-dynamic-require": 0,
+    "prettier/prettier": 0,
+    "camelcase": 0,
+    "operator-linebreak": 0,
+    "prefer-promise-reject-errors": 0,
+    "no-use-before-define": 0,
+    "no-unused-vars": 1,
+    "no-console": 0,
+    "no-sync": 0,
+    "no-continue": 0,
+    "global-require": 0
+  }
+}

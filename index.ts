@@ -1,63 +1,76 @@
-const path = require('path');
-const through = require('through2');
-const replace = require('replacestream');
+import path from "path";
+import through from "through2";
+import replace from "replacestream";
+
+type AliasMapType = Record<string, string>;
+type Options = {
+  cwd?: string;
+  paths?: AliasMapType;
+};
+type GetRegExpReturn = (name: string) => RegExp;
 
 const prefixPattenMap = {
   js: `import\\s*[^'"]*\\(?|from|require\\s*\\(`,
   // poster: wxml
   xml: `src=|url=|poster=`,
-  css: `@import\\s*|url\\s*\\(`
+  css: `@import\\s*|url\\s*\\(`,
 };
+
+type PrefixPattenMap = typeof prefixPattenMap;
 
 const suffixPatten = `\\/|['"]|\\s*\\)`;
 
-function getRegExp(prefixPatten) {
+function getRegExp(prefixPatten: string): GetRegExpReturn {
   return function (aliasName) {
-    return new RegExp(`(?:(${prefixPatten})\\s*['"]?\\s*)${aliasName}(${suffixPatten})`, 'gm');
-  }
+    return new RegExp(`(?:(${prefixPatten})\\s*['"]?\\s*)${aliasName}(${suffixPatten})`, "gm");
+  };
 }
 
-function relative(from, to) {
+function relative(from: string, to: string) {
   const relativePath = path.relative(from, to);
 
   if (!relativePath) {
-    return '.';
+    return ".";
   }
 
   return !/^\./.test(relativePath) ? `./${relativePath}` : relativePath;
 }
 
 // 100000 rows * 100 columns -> 248ms
-function replaceAll(file, dirname, aliasMap) {
+function replaceAll(file: any, dirname: string, aliasMap: AliasMapType) {
   const ext = path.extname(file.relative);
   const isStream = file.isStream();
 
-  let reg;
+  let reg: GetRegExpReturn;
   switch (ext) {
     // js
-    case '.js':
-    case '.ts':
-    case '.wxs':
+    case ".js":
+    case ".ts":
+    case ".wxs":
       reg = getRegExp(prefixPattenMap.js);
       break;
     // css
-    case '.css':
-    case '.less':
-    case '.scss':
-    case '.styl':
-    case '.stylus':
-    case '.wxss':
+    case ".css":
+    case ".less":
+    case ".scss":
+    case ".styl":
+    case ".stylus":
+    case ".wxss":
       reg = getRegExp(prefixPattenMap.css);
       break;
     // xml
-    case '.html':
-    case '.wxml':
+    case ".html":
+    case ".wxml":
       reg = getRegExp(prefixPattenMap.xml);
       break;
-    case '.jsx':
-    case '.tsx':
+    case ".jsx":
+    case ".tsx":
     default:
-      reg = getRegExp(Object.keys(prefixPattenMap).map((k) => prefixPattenMap[k]).join('|'));
+      reg = getRegExp(
+        Object.keys(prefixPattenMap)
+          .map((k) => prefixPattenMap[k as keyof PrefixPattenMap])
+          .join("|")
+      );
       break;
   }
 
@@ -99,14 +112,14 @@ function replaceAll(file, pathname, aliasMap) {
 }
 */
 
-module.exports = function (options = {}) {
-  options = {
+export default function (options: Options = {}) {
+  const _options: Required<Options> = {
     cwd: process.cwd(),
     paths: {},
     ...options,
   };
 
-  const { paths } = options;
+  const { paths } = _options;
   const emptyAlias = !Object.keys(paths).length;
 
   return through.obj(function (file, _, cb) {
@@ -120,4 +133,4 @@ module.exports = function (options = {}) {
 
     cb(null, file);
   });
-};
+}
