@@ -13,14 +13,14 @@ const gulp = require('gulp');
 const alias = require('gulp-path-alias');
 
 exports.default = () => (
-	gulp.src('src/*.js')
-		.pipe(alias({
+  gulp.src('src/*.js')
+    .pipe(alias({
       paths: {
         '@libs': path.resolve(__dirname, '../src/libs'),
         '@pages': path.resolve(__dirname, '../src/pages'),
       }
     }))
-		.pipe(gulp.dest('dist'))
+    .pipe(gulp.dest('dist'))
 );
 ```
 在 `js` 使用：（支持 `js`、`ts`、`wxs`）
