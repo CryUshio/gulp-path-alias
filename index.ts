@@ -112,7 +112,7 @@ function replaceAll(file, pathname, aliasMap) {
 }
 */
 
-export default function (options: Options = {}) {
+function alias (options: Options = {}) {
   const _options: Required<Options> = {
     cwd: process.cwd(),
     paths: {},
@@ -134,3 +134,5 @@ export default function (options: Options = {}) {
     cb(null, file);
   });
 }
+
+export = alias;
