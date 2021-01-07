@@ -1,6 +1,6 @@
 {
   "name": "gulp-path-alias",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "path alias",
   "main": "lib/index.js",
   "scripts": {
