@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.3](https://github.com/CryUshio/gulp-path-alias/compare/v1.1.2...v1.1.3) (2021-01-08)
+
+
+### Features
+
+* add test case ([2f07b6e](https://github.com/CryUshio/gulp-path-alias/commit/2f07b6e50fb35aa1c7094a707c57feb8dc3b14a7))
+
+
+### Bug Fixes
+
+* [#2](https://github.com/CryUshio/gulp-path-alias/issues/2) ([592cfed](https://github.com/CryUshio/gulp-path-alias/commit/592cfed485c391e7eb4a7b0780dee1b61ab4b1a0))
+
 ### [1.1.2](https://github.com/CryUshio/gulp-path-alias/compare/v1.1.1...v1.1.2) (2021-01-07)
 
 
