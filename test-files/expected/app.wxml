@@ -1,0 +1,10 @@
+<image src="libs"/>
+<image src="./libs"/>
+<image src="./libs/img/bg.png"/>
+<image src="@libs-b/img/bg.png"/>
+<image src="src/@libs/img/bg.png"/>
+<image src="@lib/img/bg.png"/>
+
+<audio poster="../utils/img/bg.png"></audio>
+<live-pusher url="../utils/pusher"></live-pusher>
+<a href="../utils/www"></a>

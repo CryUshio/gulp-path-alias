@@ -1,20 +1,94 @@
+const path = require('path');
+const fs = require('fs');
+const readline = require('readline');
 const gulp = require('gulp');
-const through = require('through2');
 const test = require('ava');
-const alias = require('./index');
+const { dest } = require('gulp');
+const alias = require('./lib');
 
-// TODO
-test('functional test .css', async (t) => {
-  gulp.src('./test-files/app.css')
-    .pipe(alias({
-      path: {
-        '@libs': './libs',
-        '@utils': './utils',
-      }
-    }))
-    .pipe(through.obj(function (file, _, cb) {
-      console.log(file.isStream());
-    }));
+const fileValidator = async (filepath, expectedFilepath, t) => {
+  const fileArray = [];
+  const expectFileArray = [];
 
-  t.is('', '');
+  const readFileLine = (f, arrayBuffer) => {
+    return new Promise((resolve) => {
+      const rl = readline.createInterface({
+        input: fs.createReadStream(f),
+      });
+      rl.on('line', (line) => {
+        arrayBuffer.push(line);
+      });
+      rl.on('close', resolve);
+    })
+  }
+  
+  await Promise.all([
+    readFileLine(filepath, fileArray),
+    readFileLine(expectedFilepath, expectFileArray),
+  ]);
+
+  for(let i = 0; i < expectFileArray.length; i++) {
+    const expectLine = expectFileArray[i];
+    const fileLine = fileArray[i];
+
+    if (expectLine !== fileLine) {
+      t.fail(`Validate failed at line ${i + 1}:\n${fileLine}`);
+    }
+  }
+  t.pass();
+}
+
+const BASE_PATH = path.join(__dirname, './test-files');
+const paths = {
+  '@libs': path.join(BASE_PATH, 'libs'),
+  '@utils': path.join(BASE_PATH, '../utils'),
+}
+
+
+test('functional test .css', (t) => {
+  const filepath = path.join(BASE_PATH, 'app.css');
+  const distFilepath = path.join(BASE_PATH, 'dist/app.css');
+  const expectFilepath = path.join(BASE_PATH, 'expected/app.css');
+
+  return new Promise((resolve) => {
+    gulp.src(filepath)
+      .pipe(alias({ paths }))
+      .pipe(dest(path.join(BASE_PATH, 'dist')))
+      .on('end', async () => {
+        await fileValidator(distFilepath, expectFilepath, t);
+        resolve();
+      });
+  });
+});
+
+test('functional test .js', (t) => {
+  const filepath = path.join(BASE_PATH, 'app.js');
+  const distFilepath = path.join(BASE_PATH, 'dist/app.js');
+  const expectFilepath = path.join(BASE_PATH, 'expected/app.js');
+
+  return new Promise((resolve) => {
+    gulp.src(filepath)
+      .pipe(alias({ paths }))
+      .pipe(dest(path.join(BASE_PATH, 'dist')))
+      .on('end', async () => {
+        await fileValidator(distFilepath, expectFilepath, t);
+        resolve();
+      });
+  });
+});
+
+test('functional test .wxml', (t) => {
+  const filepath = path.join(BASE_PATH, 'app.wxml');
+  const distFilepath = path.join(BASE_PATH, 'dist/app.wxml');
+  const expectFilepath = path.join(BASE_PATH, 'expected/app.wxml');
+
+  return new Promise((resolve) => {
+    gulp.src(filepath)
+      .pipe(alias({ paths }))
+      .pipe(dest(path.join(BASE_PATH, 'dist')))
+      .on('end', async () => {
+        await fileValidator(distFilepath, expectFilepath, t);
+        resolve();
+      });
+  });
 });
