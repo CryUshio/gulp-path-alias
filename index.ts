@@ -12,8 +12,8 @@ type GetRegExpReturn = (name: string) => RegExp;
 const prefixPattenMap = {
   js: `import\\s*[^'"]*\\(?|from|require\\s*\\(`,
   // poster: wxml
-  xml: `src=|url=|poster=`,
-  css: `@import\\s*|url\\s*\\(`,
+  xml: `src=|url=|poster=|href=`,
+  css: `@import\\s*|url\\s*\\(`
 };
 
 type PrefixPattenMap = typeof prefixPattenMap;
