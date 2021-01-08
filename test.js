@@ -32,7 +32,7 @@ const fileValidator = async (filepath, expectedFilepath, t) => {
     const fileLine = fileArray[i];
 
     if (expectLine !== fileLine) {
-      t.fail(`Validate failed at line ${i}`);
+      t.fail(`Validate failed at line ${i + 1}:\n${fileLine}`);
     }
   }
   t.pass();
@@ -41,7 +41,7 @@ const fileValidator = async (filepath, expectedFilepath, t) => {
 const BASE_PATH = path.join(__dirname, './test-files');
 const paths = {
   '@libs': path.join(BASE_PATH, 'libs'),
-  '@utils': path.join(BASE_PATH, 'utils'),
+  '@utils': path.join(BASE_PATH, '../utils'),
 }
 
 

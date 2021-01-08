@@ -12,5 +12,5 @@ import('./libs/foo');
 import('@libs-b/foo');
 import('src/@libs');
 import('@lib/foo');
-require('./utils/b');
-const b = require('./utils/b');
+require('../utils/b');
+const b = require('../utils/b');
