@@ -1,0 +1,18 @@
+@import "libs";
+@import "./libs";
+@import "./libs/var";
+@import "@libs-b/var";
+@import "@lib/var";
+@import "src/@libs/var";
+@import"./libs/var";
+
+.bg {
+  background-image: url(libs);
+  background-image: url(./libs);
+  background-image: url(./libs/img/bg.png);
+  background-image: url(@libs-b/var);
+  background-image: url(src/@libs/var);
+  background-image: url( ./utils/img/bg.png );
+  background-image: url( './utils/img/bg.png' );
+  background-image: url( ' ./utils/img/bg.png ' );
+}

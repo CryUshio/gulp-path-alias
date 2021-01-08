@@ -1,6 +1,7 @@
 import path from "path";
 import through from "through2";
 import replace from "replacestream";
+import slash from "slash";
 
 type AliasMapType = Record<string, string>;
 type Options = {
@@ -27,7 +28,7 @@ function getRegExp(prefixPatten: string): GetRegExpReturn {
 }
 
 function relative(from: string, to: string) {
-  const relativePath = path.relative(from, to);
+  const relativePath = slash(path.relative(from, to));
 
   if (!relativePath) {
     return ".";
