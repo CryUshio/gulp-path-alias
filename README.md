@@ -7,6 +7,21 @@ $ npm install --save-dev gulp-path-alias
 ```
 
 ## Usage
+### Rules
+#### type
+```ts
+interface AliasType {
+  [key: string]: string;
+}
+```
+#### key
+1. 常规 `key`：正常匹配
+2. 全字匹配 `key`：在常规 `key` 后加上 `$` 符号
+#### value
+1. 绝对路径：根据 `options.pwd` 替换为相对路径
+2. 相对路径：直接替换
+
+### Example
 配置 `gulp task`
 ```js
 const gulp = require('gulp');
@@ -18,6 +33,7 @@ exports.default = () => (
       paths: {
         '@libs': path.resolve(__dirname, '../src/libs'),
         '@pages': path.resolve(__dirname, '../src/pages'),
+        'wx$': 'wx/libs', // 将 'wx' 替换为 'wx/libs'
       }
     }))
     .pipe(gulp.dest('dist'))
