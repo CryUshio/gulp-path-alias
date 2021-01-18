@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/CryUshio/gulp-path-alias/compare/v1.1.3...v1.2.0) (2021-01-18)
+
+
+### Features
+
+* 支持类 webpack 全字匹配, 支持 alias 带斜线, 支持替换为相对路径 ([adad6cd](https://github.com/CryUshio/gulp-path-alias/commit/adad6cde1688a3aeb25b5b6437594056fd9e7fef))
+
 ### [1.1.3](https://github.com/CryUshio/gulp-path-alias/compare/v1.1.2...v1.1.3) (2021-01-08)
 
 
