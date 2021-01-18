@@ -22,6 +22,7 @@
     "no-console": 0,
     "no-sync": 0,
     "no-continue": 0,
-    "global-require": 0
+    "global-require": 0,
+    "quotes": [2, "single"]
   }
 }

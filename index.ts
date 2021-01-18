@@ -1,89 +1,121 @@
-import path from "path";
-import through from "through2";
-import replace from "replacestream";
-import slash from "slash";
+import path from 'path';
+import through from 'through2';
+import replace from 'replacestream';
+import slash from 'slash';
 
 type AliasMapType = Record<string, string>;
 type Options = {
   cwd?: string;
   paths?: AliasMapType;
 };
-type GetRegExpReturn = (name: string) => RegExp;
+type AliasListType = Array<{
+  aliasKey: string;
+  aliasValue: string;
+}>;
 
-const prefixPattenMap = {
-  js: `import\\s*[^'"]*\\(?|from|require\\s*\\(`,
+const prefixPatternMap = {
+  js: 'import\\s*[^\'"]*\\(?|from|require\\s*\\(',
   // poster: wxml
-  xml: `src=|url=|poster=|href=`,
-  css: `@import\\s*|url\\s*\\(`
+  xml: 'src=|url=|poster=|href=',
+  css: '@import\\s*|url\\s*\\(',
 };
+/* 全匹配的正则规则 */
+const exactMatchPattern = /\$$/;
 
-type PrefixPattenMap = typeof prefixPattenMap;
+type PrefixPatternMap = typeof prefixPatternMap;
 
-const suffixPatten = `\\/|['"]|\\s*\\)`;
-
-function getRegExp(prefixPatten: string): GetRegExpReturn {
-  return function (aliasName) {
-    return new RegExp(`(?:(${prefixPatten})\\s*['"]?\\s*)${aliasName}(${suffixPatten})`, "gm");
-  };
+/**
+ * 编码别名替换项
+ * eg. '/' -> '\\/'
+ */
+function encodeAliasString(alias: string): string {
+  return alias.replace('/', '\\/');
 }
 
+/* 获取匹配前缀正则字符串 */
+function getPrefixPatternString(prefixPatten: string): string {
+  return `(?:(${prefixPatten})\\s*['"]?\\s*)`;
+}
+
+/* 获取匹配后缀正则字符串 */
+function getSuffixPatternString(exactMatch = false): string {
+  const suffixPattern = '[\'"]|\\s*\\)';
+  // 全匹配时，后面没有内容，拿掉斜线
+  return exactMatch ? suffixPattern : `\\/|${suffixPattern}`;
+}
+
+/* 获取匹配主体和后缀的正则字符串 */
+function getRemainPatternString(aliasKey: string, exactMatch?: boolean): string {
+  const _aliasKey = exactMatch ? aliasKey.replace(exactMatchPattern, '') : aliasKey;
+  return `${_aliasKey}(${getSuffixPatternString(exactMatch)})`;
+}
+
+/* 获取相对路径 */
 function relative(from: string, to: string) {
   const relativePath = slash(path.relative(from, to));
 
   if (!relativePath) {
-    return ".";
+    return '.';
   }
 
   return !/^\./.test(relativePath) ? `./${relativePath}` : relativePath;
 }
 
 // 100000 rows * 100 columns -> 248ms
-function replaceAll(file: any, dirname: string, aliasMap: AliasMapType) {
+function replaceAll(file: any, dirname: string, aliasList: AliasListType) {
   const ext = path.extname(file.relative);
   const isStream = file.isStream();
 
-  let reg: GetRegExpReturn;
+  /* 根据后缀名获得前缀正则字符串，降低复杂度 */
+  let prefixPatternString: string;
   switch (ext) {
     // js
-    case ".js":
-    case ".ts":
-    case ".wxs":
-      reg = getRegExp(prefixPattenMap.js);
+    case '.js':
+    case '.ts':
+    case '.wxs':
+      prefixPatternString = getPrefixPatternString(prefixPatternMap.js);
       break;
     // css
-    case ".css":
-    case ".less":
-    case ".scss":
-    case ".styl":
-    case ".stylus":
-    case ".wxss":
-      reg = getRegExp(prefixPattenMap.css);
+    case '.css':
+    case '.less':
+    case '.scss':
+    case '.sass':
+    case '.styl':
+    case '.stylus':
+    case '.wxss':
+      prefixPatternString = getPrefixPatternString(prefixPatternMap.css);
       break;
     // xml
-    case ".html":
-    case ".wxml":
-      reg = getRegExp(prefixPattenMap.xml);
+    case '.html':
+    case '.wxml':
+      prefixPatternString = getPrefixPatternString(prefixPatternMap.xml);
       break;
-    case ".jsx":
-    case ".tsx":
+    case '.jsx':
+    case '.tsx':
     default:
-      reg = getRegExp(
-        Object.keys(prefixPattenMap)
-          .map((k) => prefixPattenMap[k as keyof PrefixPattenMap])
-          .join("|")
+      prefixPatternString = getPrefixPatternString(
+        Object.keys(prefixPatternMap)
+          .map((k) => prefixPatternMap[k as keyof PrefixPatternMap])
+          .join('|')
       );
       break;
   }
 
-  Object.keys(aliasMap).forEach((alias) => {
-    const regExp = reg(alias);
-    const subReg = new RegExp(`${alias}(${suffixPatten})`);
-    const replacer = `${relative(dirname, aliasMap[alias])}$1`;
+  aliasList.forEach(({ aliasKey, aliasValue }) => {
+    const isExactMatch = exactMatchPattern.test(aliasKey);
+    const remainPatternString = getRemainPatternString(aliasKey, isExactMatch);
 
+    const sentenceReg = new RegExp(`${prefixPatternString}${remainPatternString}`, 'gm');
+    const subReg = new RegExp(remainPatternString);
+
+    /* 如果替换路径是相对路径不使用 relative 路径替换，而是直接替换 */
+    const replacer = path.isAbsolute(aliasValue) ? `${relative(dirname, aliasValue)}$1` : `${aliasValue}$1`;
+
+    /* 先确定文件中匹配的语句，再替换其中所有匹配的 alias */
     if (isStream) {
-      file.contents = file.contents.pipe(replace(regExp, (match) => match.replace(subReg, replacer)));
+      file.contents = file.contents.pipe(replace(sentenceReg, (match) => match.replace(subReg, replacer)));
     } else {
-      file.contents = Buffer.from(String(file.contents).replace(regExp, (match) => match.replace(subReg, replacer)));
+      file.contents = Buffer.from(String(file.contents).replace(sentenceReg, (match) => match.replace(subReg, replacer)));
     }
   });
 
@@ -113,7 +145,7 @@ function replaceAll(file, pathname, aliasMap) {
 }
 */
 
-function alias (options: Options = {}) {
+function alias(options: Options = {}) {
   const _options: Required<Options> = {
     cwd: process.cwd(),
     paths: {},
@@ -121,16 +153,29 @@ function alias (options: Options = {}) {
   };
 
   const { paths } = _options;
-  const emptyAlias = !Object.keys(paths).length;
+  const isEmptyAlias = !Object.keys(paths).length;
+
+  /* 初始化 aliasList，全局使用，避免重复计算 */
+  const aliasList: AliasListType = Object.keys(paths)
+    /* 全匹配的需要优先替换，放在前面 */
+    .sort((a) => (exactMatchPattern.test(a) ? -1 : 1))
+    .map((aliasKey) => {
+      /* 替换斜线，否则生成 pattern 时会出错 */
+      const encodeKey = encodeAliasString(aliasKey);
+      return {
+        aliasKey: encodeKey,
+        aliasValue: paths[aliasKey],
+      };
+    });
 
   return through.obj(function (file, _, cb) {
     const dirname = path.dirname(file.path);
 
-    if (file.isNull() || emptyAlias) {
+    if (file.isNull() || isEmptyAlias) {
       return cb(null, file);
     }
 
-    file = replaceAll(file, dirname, paths);
+    file = replaceAll(file, dirname, aliasList);
 
     cb(null, file);
   });

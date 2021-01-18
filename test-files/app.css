@@ -13,6 +13,7 @@
   background-image: url(@libs-b/var);
   background-image: url(src/@libs/var);
   background-image: url( @utils/img/bg.png );
+  background-image: url( @utils-lib/img/bg.png );
   background-image: url( '@utils/img/bg.png' );
   background-image: url( ' @utils/img/bg.png ' );
 }
