@@ -16,3 +16,5 @@ require('@utils/b');
 const b = require('@utils/b');
 require('@utils-lib/b');
 require('@path/to');
+
+require('@utils/b');require('@utils/b');

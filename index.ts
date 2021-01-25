@@ -47,7 +47,7 @@ function getSuffixPatternString(exactMatch = false): string {
 /* 获取匹配主体和后缀的正则字符串 */
 function getRemainPatternString(aliasKey: string, exactMatch?: boolean): string {
   const _aliasKey = exactMatch ? aliasKey.replace(exactMatchPattern, '') : aliasKey;
-  return `${_aliasKey}(${getSuffixPatternString(exactMatch)})`;
+  return `(?<alias>${_aliasKey})(${getSuffixPatternString(exactMatch)})`;
 }
 
 /* 获取相对路径 */
@@ -104,18 +104,21 @@ function replaceAll(file: any, dirname: string, aliasList: AliasListType) {
   aliasList.forEach(({ aliasKey, aliasValue }) => {
     const isExactMatch = exactMatchPattern.test(aliasKey);
     const remainPatternString = getRemainPatternString(aliasKey, isExactMatch);
-
     const sentenceReg = new RegExp(`${prefixPatternString}${remainPatternString}`, 'gm');
-    const subReg = new RegExp(remainPatternString);
 
-    /* 如果替换路径是相对路径不使用 relative 路径替换，而是直接替换 */
-    const replacer = path.isAbsolute(aliasValue) ? `${relative(dirname, aliasValue)}$1` : `${aliasValue}$1`;
+    const replacer = (match: string, ...args: any[]) => {
+      const group: Record<string, string> = args.pop();
+      const { alias } = group;
+      /* 如果替换路径是相对路径不使用 relative 路径替换，而是直接替换 */
+      const replaceStr = path.isAbsolute(aliasValue) ? relative(dirname, aliasValue) : aliasValue;
+      return match.replace(alias, replaceStr);
+    };
 
     /* 先确定文件中匹配的语句，再替换其中所有匹配的 alias */
     if (isStream) {
-      file.contents = file.contents.pipe(replace(sentenceReg, (match) => match.replace(subReg, replacer)));
+      file.contents = file.contents.pipe(replace(sentenceReg, replacer));
     } else {
-      file.contents = Buffer.from(String(file.contents).replace(sentenceReg, (match) => match.replace(subReg, replacer)));
+      file.contents = Buffer.from(String(file.contents).replace(sentenceReg, replacer));
     }
   });
 
