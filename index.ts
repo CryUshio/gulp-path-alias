@@ -148,6 +148,10 @@ function replaceAll(file, pathname, aliasMap) {
 }
 */
 
+/**
+ * 
+ * @param options 
+ */
 function alias(options: Options = {}) {
   const _options: Required<Options> = {
     cwd: process.cwd(),

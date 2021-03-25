@@ -29,7 +29,7 @@
     "email": "1151291182@qq.com",
     "url": "https://github.com/CryUshio"
   },
-  "license": "LGPL-2.1-or-later",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/CryUshio/gulp-path-alias/issues"
   },
