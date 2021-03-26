@@ -126,29 +126,6 @@ function replaceAll(file: any, dirname: string, aliasList: AliasListType) {
 }
 
 /**
- * 100000 rows * 100 columns -> 324ms
- * 
-function replaceAll(file, pathname, aliasMap) {
-  const isStream = file.isStream();
-  const aliasList = Object.keys(aliasMap);
-  const aliasMatch = `(${aliasList.join('|')})`;
-  const reg = getRegExp(aliasMatch);
-
-  function replaceOne(match) {
-    return match.replace(new RegExp(aliasMatch), (m) => relative(pathname, aliasMap[m]));
-  }
-
-  if (isStream) {
-    file.contents = file.contents.pipe(replace(reg, replaceOne));
-  } else {
-    file.contents = Buffer.from(String(file.contents).replace(reg, replaceOne));
-  }
-
-  return file;
-}
-*/
-
-/**
  * 
  * @param options 
  */
